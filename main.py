@@ -1,7 +1,6 @@
 import logging
 from pyrogram import Client, filters
-from pyrogram.handlers import 
-CallbackQueryHandler
+from pyrogram.handlers import CallbackQueryHandler
 from pyrogram.types import Message
 from config import API_ID, API_HASH, BOT_TOKEN, OWNER_ID
 from handlers import start_handler, callback_handler, reaction_flow_handler

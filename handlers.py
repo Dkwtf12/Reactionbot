@@ -12,7 +12,7 @@ user_state = {}
 
 async def start_handler(client: Client, message: Message):
     kb = InlineKeyboardMarkup([
-        [InlineKeyboardButton("➕ Add me to your Channel", url="https://t.me/BotFather")],
+        [InlineKeyboardButton("➕ Add me to your Channel", url=f"https://t.me/{client.me.username}?startchannel=true")],
         [InlineKeyboardButton("Give Reaction", callback_data="give_reaction")]
     ])
     await message.reply_text(

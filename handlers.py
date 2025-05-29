@@ -12,13 +12,14 @@ user_state = {}
 
 async def start_handler(client: Client, message: Message):
     kb = InlineKeyboardMarkup([
-        [InlineKeyboardButton("➕ Add me to your Channel", url=f"https://t.me/{client.me.username}?startchannel=true")],
+        [InlineKeyboardButton("➕ Add me to your Channel", url="https://t.me/BotFather")],
         [InlineKeyboardButton("Give Reaction", callback_data="give_reaction")]
     ])
     await message.reply_text(
         f"Hi Sir 👋\nI am your Reaction Assistant! ❤️",
         reply_markup=kb
     )
+
 
 async def callback_handler(client: Client, callback_query: CallbackQuery):
     data = callback_query.data
@@ -31,6 +32,7 @@ async def callback_handler(client: Client, callback_query: CallbackQuery):
         user_state[callback_query.from_user.id] = {"emoji": emoji}
         await callback_query.message.reply("Send me the message link to react to:")
 
+
 async def reaction_flow_handler(client: Client, message: Message):
     uid = message.from_user.id
     if uid not in user_state:
@@ -40,23 +42,29 @@ async def reaction_flow_handler(client: Client, message: Message):
 
     if "link" not in state:
         state["link"] = message.text
-        await message.reply("How many reactions to add?")
+        return await message.reply("How many reactions to add?")
     else:
         try:
             count = int(message.text)
             link = state["link"]
             emoji = state["emoji"]
-            parts = link.split("/")
+
+            parts = link.strip().split("/")
+            if len(parts) < 2:
+                return await message.reply("⚠️ Invalid link format.")
+
             chat_username = parts[-2]
             msg_id = int(parts[-1])
+
             chat = await client.get_chat(chat_username)
             result = await add_reactions(client, chat.id, msg_id, emoji, count)
+
             if result:
                 increment_reaction(uid, emoji, count)
                 await message.reply("✅ Reaction added! Check your channel.")
             else:
                 await message.reply("❌ Failed to add reactions.")
-        except:
-            await message.reply("Invalid input. Start again.")
+        except Exception as e:
+            await message.reply(f"❌ Error: {e}\nStart again.")
         finally:
             user_state.pop(uid, None)
